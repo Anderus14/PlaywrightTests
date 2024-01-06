@@ -5,7 +5,7 @@ namespace PlaywrightTests
 {
 	public class DynamicIdPage
 	{
-		private static IPage _page;
+		private IPage _page;
 		public ILocator PageLabel() => _page.Locator("//h3[text()='Dynamic ID']");
 		public ILocator DynamicIdButton() => _page.GetByText("Button with Dynamic ID");
 	
