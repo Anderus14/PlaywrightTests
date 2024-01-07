@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Playwright;
 
-namespace PlaywrightTests
+namespace Pages
 {
 	public class DynamicIdPage
 	{
@@ -9,6 +9,10 @@ namespace PlaywrightTests
 		public ILocator PageLabel() => _page.Locator("//h3[text()='Dynamic ID']");
 		public ILocator DynamicIdButton() => _page.GetByText("Button with Dynamic ID");
 	
-		public DynamicIdPage(IPage page) => _page = page;
+		public DynamicIdPage(IPage page)  
+		{
+			_page = page;
+			_page.WaitForURLAsync("**/dynamicid");
+		}
 	}
 }
