@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
 
 namespace PlaywrightTests;
 
@@ -10,7 +11,8 @@ public class Tests : PageTest
 	private ILocator DynamicIdButton() => Page.Locator("//a[text()='Dynamic ID']");
 	private ILocator TextInputButton() => Page.Locator("//a[text()='Text Input']");
 	private ILocator VerifyTextButton() => Page.Locator("//a[text()='Verify Text']");
-	
+	private ILocator DynamicPageButton() => Page.Locator("//a[text()='Dynamic Table']");
+
 	[SetUp]
 	public async Task Setup()
 	{
@@ -34,9 +36,10 @@ public class Tests : PageTest
 		await Expect(Page).ToHaveURLAsync("http://uitestingplayground.com/textinput");
 		await Expect(textInputPage.MyButtonInput()).ToHaveAttributeAsync("placeholder","MyButton");
 		await Expect(textInputPage.UpdatingButton()).ToHaveTextAsync("Button That Should Change it's Name Based on Input Value");
-		await textInputPage.InputEnterText("dupa kota");
+		await Page.PauseAsync();
+		await textInputPage.InputEnterText(TestContext.Parameters["username"]);
 		await textInputPage.ClickButton();
-		await Expect(textInputPage.UpdatingButton()).ToHaveTextAsync("dupa kota");
+		await Expect(textInputPage.UpdatingButton()).ToHaveTextAsync(TestContext.Parameters["username"]);
 	}
 	
 	[Test]
@@ -44,8 +47,17 @@ public class Tests : PageTest
 	{
 		await VerifyTextButton().ClickAsync();
 		Pages.VerifyTextPage verifyTextPage = new(Page);
+		var attribute = verifyTextPage.HelloUsernameText().GetAttributeAsync("class").Result;
 		await Expect(Page).ToHaveURLAsync("http://uitestingplayground.com/verifytext");
 		await Expect(verifyTextPage.PageLabel()).ToHaveTextAsync("Verify Text");
 		await Expect(verifyTextPage.HelloUsernameText()).ToHaveTextAsync("Hello UserName!");
+	}
+
+	[Test]
+	public async Task Test1()
+	{
+		await DynamicIdButton().ClickAsync();
+		Pages.DynamicTable dynamicTable = new(Page);
+		await dynamicTable.TableElements.AllAsync();
 	}
 }

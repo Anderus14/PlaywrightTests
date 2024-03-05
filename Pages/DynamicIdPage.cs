@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.Playwright;
 
 namespace Pages
