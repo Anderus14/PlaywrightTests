@@ -1,3 +1,4 @@
+using System.Xml;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 using NUnit.Framework;
@@ -8,10 +9,10 @@ namespace PlaywrightTests;
 [TestFixture]
 public class Tests : PageTest
 {
+	XmlDocument xmlDoc;
 	private ILocator DynamicIdButton() => Page.Locator("//a[text()='Dynamic ID']");
 	private ILocator TextInputButton() => Page.Locator("//a[text()='Text Input']");
 	private ILocator VerifyTextButton() => Page.Locator("//a[text()='Verify Text']");
-	private ILocator DynamicPageButton() => Page.Locator("//a[text()='Dynamic Table']");
 
 	[SetUp]
 	public async Task Setup()
@@ -24,22 +25,23 @@ public class Tests : PageTest
 		await DynamicIdButton().ClickAsync();
 		Pages.DynamicIdPage dynamicIdPage = new(Page);
 		await Expect(Page).ToHaveURLAsync("http://uitestingplayground.com/dynamicid");
-		await Expect(dynamicIdPage.PageLabel()).ToHaveTextAsync("Dynamic ID");
-		await dynamicIdPage.DynamicIdButton().ClickAsync();
+		await Expect(dynamicIdPage.PageLabel).ToHaveTextAsync("Dynamic ID");
+		await dynamicIdPage.DynamicIdButton.ClickAsync();
 	}
 	
 	[Test]
 	public async Task TextInputTest()
 	{
+		xmlDoc.Load($"{Directory.GetCurrentDirectory()}/test.xml");
+		
 		await TextInputButton().ClickAsync();
 		Pages.TextInputPage textInputPage = new(Page);
 		await Expect(Page).ToHaveURLAsync("http://uitestingplayground.com/textinput");
-		await Expect(textInputPage.MyButtonInput()).ToHaveAttributeAsync("placeholder","MyButton");
-		await Expect(textInputPage.UpdatingButton()).ToHaveTextAsync("Button That Should Change it's Name Based on Input Value");
-		await Page.PauseAsync();
+		await Expect(textInputPage.MyButtonInput).ToHaveAttributeAsync("placeholder","MyButton");
+		await Expect(textInputPage.UpdatingButton).ToHaveTextAsync("Button That Should Change it's Name Based on Input Value");
 		await textInputPage.InputEnterText(TestContext.Parameters["username"]);
 		await textInputPage.ClickButton();
-		await Expect(textInputPage.UpdatingButton()).ToHaveTextAsync(TestContext.Parameters["username"]);
+		await Expect(textInputPage.UpdatingButton).ToHaveTextAsync(TestContext.Parameters["username"]);
 	}
 	
 	[Test]
@@ -47,10 +49,10 @@ public class Tests : PageTest
 	{
 		await VerifyTextButton().ClickAsync();
 		Pages.VerifyTextPage verifyTextPage = new(Page);
-		var attribute = verifyTextPage.HelloUsernameText().GetAttributeAsync("class").Result;
+		var attribute = verifyTextPage.HelloUsernameText.GetAttributeAsync("class").Result;
 		await Expect(Page).ToHaveURLAsync("http://uitestingplayground.com/verifytext");
-		await Expect(verifyTextPage.PageLabel()).ToHaveTextAsync("Verify Text");
-		await Expect(verifyTextPage.HelloUsernameText()).ToHaveTextAsync("Hello UserName!");
+		await Expect(verifyTextPage.PageLabel).ToHaveTextAsync("Verify Text");
+		await Expect(verifyTextPage.HelloUsernameText).ToHaveTextAsync("Hello UserName!");
 	}
 
 	[Test]
